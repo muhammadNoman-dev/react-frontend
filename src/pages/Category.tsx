@@ -72,7 +72,7 @@ const Category = () => {
                     onSubmit={methods.handleSubmit(onSubmit)}
                     className="flex flex-col items-center mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
                 >
-                    <FormInput placeholder="Enter email" name="name" />
+                    <FormInput placeholder="Enter Category" name="name" />
                     {updateData ? <div className='flex space-x-2'>
                         <Button className="bg-blue-400" type="submit">Update</Button>
                         <Button className="bg-blue-400" type="reset" onClick={() => setUpdateData(null)}>New</Button>
