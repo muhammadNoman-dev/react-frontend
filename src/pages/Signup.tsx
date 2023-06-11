@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { Button, FormInput, Input } from "../components"
+import { Button, FormInput } from "../components"
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormProvider, useForm } from "react-hook-form";
 import * as Yup from "yup";

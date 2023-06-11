@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { authService } from "../services/index";
 import { AppThunk, RootState } from "./index";
 import { ProfileInterface, LoginInterface, SigupInterface } from "../types/auth.types";
+import { apiConfig } from "../config";
 
 export interface AuthStateInterface {
 	authDone: boolean;
@@ -51,17 +52,18 @@ const { loggedIn, loggingIn, loggingInFailed, clearAuthState } =
 	authSlice.actions;
 
 const signup = ( credentials: SigupInterface ) : AppThunk => async dispatch => {
-	const { data: loginResponse } = await authService.signup(credentials);
+	 await authService.signup(credentials);
 }
 
 const login =
-	(credentials: LoginInterface): AppThunk =>
+	(credentials: LoginInterface, cb?: () => void ): AppThunk =>
 	async dispatch => {
 		try {
 			dispatch(loggingIn());
 			const { data: loginResponse } = await authService.login(credentials);
-			// const profileResponse = await reLogin(loginResponse.token);
-			dispatch(loggedIn({ ...loginResponse }));
+			const profileResponse = await reLogin(loginResponse.token);
+			dispatch(loggedIn({ ...loginResponse, ...profileResponse }));
+			if(cb) cb()
 		} catch (error) {
 			dispatch(loggingInFailed());
 		}
@@ -70,6 +72,13 @@ const login =
 const logout = (): AppThunk => async dispatch => {
 	authService.logout();
 	dispatch(clearAuthState());
+};
+
+const reLogin = async (token: string) => {
+	authService.setAuthToken(token);
+	apiConfig.setAuthToken(token);
+	const { data: profileResponse } = await authService.getProfile();
+	return profileResponse;
 };
 
 

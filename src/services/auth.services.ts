@@ -4,9 +4,11 @@ import { ProfileInterface, LoginInterface, SigupInterface } from "../types/auth.
 const ROOT_PATH = "auth";
 
 export default class AuthService {
-	static login = (credentials: LoginInterface) => axios.post<ProfileInterface>(`localhost:8081/api/auth/login`, credentials);
+	static login = (credentials: LoginInterface) => axios.post<ProfileInterface>(`/auth/login`, credentials);
 
-	static signup = (credentials:SigupInterface ) => axios.post<ProfileInterface>(`localhost:8081/api/auth/signup`, credentials);
+	static signup = (credentials:SigupInterface ) =>{
+		axios.post<ProfileInterface>(`/auth/signup`, credentials);
+	} 
 
 	static getProfile = () => axios.get<ProfileInterface>(`${ROOT_PATH}/profile`);
 

@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Button, FormInput, Input } from "../components"
-import { Link } from "react-router-dom"
+import { Button, FormInput } from "../components"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 import * as Yup from "yup";
 import useAppDispatch from "../hooks/useAppDispatch";
 import { LoginInterface } from "../types/auth.types";
@@ -17,11 +17,11 @@ const loginValidationSchema = Yup.object().shape({
 const Login = () => {
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const methods = useForm<LoginInterface>({ resolver: yupResolver(loginValidationSchema) });
 
   const onSubmit = (data: LoginInterface) => {
-    console.log("data", data)
-    dispatch(login(data));
+    dispatch(login(data, () => navigate("./dashboard") ) );
   };
 
 

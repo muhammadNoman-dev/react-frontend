@@ -15,7 +15,7 @@ const App: React.FC = () => {
 
     <BrowserRouter>
       {
-        !isLoggedIn ?
+        isLoggedIn ?
           <Routes>
             <Route path={APP_ROUTES.DASHBOARD} element={<Dashboard />} /> :
           </Routes> 
