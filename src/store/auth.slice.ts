@@ -56,14 +56,13 @@ const signup = ( credentials: SigupInterface ) : AppThunk => async dispatch => {
 }
 
 const login =
-	(credentials: LoginInterface, cb?: () => void ): AppThunk =>
+	(credentials: LoginInterface ): AppThunk =>
 	async dispatch => {
 		try {
 			dispatch(loggingIn());
 			const { data: loginResponse } = await authService.login(credentials);
 			const profileResponse = await reLogin(loginResponse.token);
 			dispatch(loggedIn({ ...loginResponse, ...profileResponse }));
-			if(cb) cb()
 		} catch (error) {
 			dispatch(loggingInFailed());
 		}
@@ -79,6 +78,19 @@ const reLogin = async (token: string) => {
 	apiConfig.setAuthToken(token);
 	const { data: profileResponse } = await authService.getProfile();
 	return profileResponse;
+};
+
+
+const fetchUserProfile = (): AppThunk => async dispatch => {
+	const token = authService.getAuthToken();
+	if (token)
+		try {
+			dispatch(loggingIn());
+			const profileResponse = await reLogin(token);
+			dispatch(loggedIn(profileResponse));
+		} catch (error) {
+			dispatch(loggingInFailed());
+		}
 };
 
 
@@ -100,4 +112,5 @@ export {
 	selectInitialAuthDone,
 	selectAccessToken,
 	selectSignedIn,
+	fetchUserProfile
 };

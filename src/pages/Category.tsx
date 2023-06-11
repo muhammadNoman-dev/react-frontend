@@ -1,92 +1,90 @@
-import React, { useState } from 'react';
-import { Space, Table, Tag } from 'antd';
+import { useEffect, useState } from 'react';
+import { Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { Button, FormInput } from '../components';
 import useAppDispatch from '../hooks/useAppDispatch';
 import { FormProvider, useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { deleteCategory, saveCategory, selectCategoryList } from '../store/category.slice';
+import useAppSelector from '../hooks/useAppSelector';
+import { GetCategoryInterface } from '../types/category.types';
 
-interface CategoryType {
-    id: string;
+
+
+export interface Category {
     name: string;
 }
 
-const columns: ColumnsType<CategoryType> = [
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-        render: (text) => <a>{text}</a>,
-    },
-    {
-        title: 'Action',
-        key: 'action',
-        render: (_, record) => (
-            <Space size="middle">
-                <a>Delete</a>
-            </Space>
-        ),
-    },
-];
-
-const data: CategoryType[] = [
-    {
-        id: '1',
-        name: 'John Brown',
-
-    },
-    {
-        id: '2',
-        name: 'Jim Green',
-
-    },
-    {
-        id: '3',
-        name: 'Joe Black',
-    },
-];
-
-export interface Category {
-    categoryName: string;
-}
-
-const sigupValidationSchema = Yup.object().shape({
-    categoryName: Yup.string().required().label("Name"),
+const categoryValidationSchema = Yup.object().shape({
+    name: Yup.string().required().label("Category Name"),
 });
 
 const Category = () => {
-    const [clickedRowId, setClickedRowId] = useState<string>();
-
     const dispatch = useAppDispatch();
-    const methods = useForm<Category>({ resolver: yupResolver(sigupValidationSchema) });
+    const categories = useAppSelector(selectCategoryList())
+    const [updateData, setUpdateData] = useState<any>(null)
+
+    const columns: ColumnsType<GetCategoryInterface> = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text) => <a>{text}</a>,
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_, record) => (
+                <Space size="middle"  >
+                    <div className='flex space-x-2 cursor-pointer'>
+                        <div onClick={() => setUpdateData(record)}>Update</div>
+                        <div className='border-b border-l-2'></div>
+                        <div className="" onClick={() => dispatch(deleteCategory(record._id))}>Delete</div>
+                    </div>
+
+                </Space>
+            ),
+        },
+
+    ];
+
+
+    const methods = useForm<Category>({ resolver: yupResolver(categoryValidationSchema) });
+
+    useEffect(() => {
+        methods.reset({ name: updateData?.name })
+    }, [updateData])
+
+
 
     const onSubmit = (data: any) => {
-        console.log("data", data)
+        dispatch(saveCategory({ ...data, _id: updateData?._id }));
+        methods.reset({ name: "" })
+        setUpdateData(null)
     };
 
-    const handleRowClick = (record: CategoryType) => {
-        console.log(record.id); // Log the clicked row's ID
-        setClickedRowId(record.id); // Update the state with the clicked row's ID
-    };
     return (
-        <div>
-
-            <div>Category</div>
+        <div className='p-6' >
             <FormProvider {...methods}>
+                <div>Category</div>
                 <form
                     onSubmit={methods.handleSubmit(onSubmit)}
                     className="flex flex-col items-center mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
                 >
-                    <FormInput placeholder="Enter email" name="categoryName" />
+                    <FormInput placeholder="Enter email" name="name" />
+                    {updateData ? <div className='flex space-x-2'>
+                        <Button className="bg-blue-400" type="submit">Update</Button>
+                        <Button className="bg-blue-400" type="reset" onClick={() => setUpdateData(null)}>New</Button>
+                    </div> : <Button className="bg-blue-400" type="submit" >Create</Button>}
 
-                    <Button className="bg-blue-400" type="submit" >Submit</Button>
                 </form>
             </FormProvider>
 
-            <Table columns={columns} dataSource={data} onRow={(record) => ({
-                onClick: () => handleRowClick(record), // Attach event handler to each row
-            })} />
+            <Table pagination={{
+                pageSize: 5,
+            }} columns={columns} dataSource={categories}
+            />
 
         </div>
     )

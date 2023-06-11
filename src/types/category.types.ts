@@ -1,11 +1,11 @@
 
 export interface CreateCategoryInterface {
-	categoryName: string;
+	name: string;
 }
 
 export interface GetCategoryInterface {
-	id: string;
-    categoryName: string;
+	_id: string;
+    name: string;
 }
 
 export interface DeleteCategoryInterface {

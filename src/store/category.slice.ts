@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {  categoryService } from "../services/index";
 import { AppThunk, RootState } from "./index";
 import { DeleteCategoryInterface, GetCategoryInterface } from "../types/category.types";
+import { deleteCarSuccess } from "./car.slice";
 
 export interface CategoryStateInterface {
 	list: GetCategoryInterface[]
@@ -36,18 +37,20 @@ const categorySlice = createSlice({
 		},
         savingCategorySuccess: (category, action: PayloadAction<GetCategoryInterface>) => {
 			category.saving = false
-			const Updated = category.list?.find(e => e.id === action.payload.id) as GetCategoryInterface
+			const Updated = category.list?.find(e => e._id === action.payload._id) as GetCategoryInterface
             if(Updated){
-                const categoryIndex = category.list.findIndex((list) => list.id === action.payload.id )
+                const categoryIndex = category.list.findIndex((list) => list._id === action.payload._id )
                 category.list.splice(categoryIndex,1,action.payload)
             }else category.list.unshift(action.payload)
 		},
         savingFailed:( category,action:PayloadAction) =>{
             category.saving= false
         },
-        deleteCategorySuccess: (category, action:PayloadAction<DeleteCategoryInterface>)=>{
-            const categoryIndex = category.list.findIndex((list) => list.id === action.payload.id )
-            category.list.splice(categoryIndex,1)
+        deleteCategorySuccess: (category, action)=>{
+            const categoryIndex = category.list.findIndex((list) => list._id === action.payload._id )
+            if (categoryIndex >= 0) {
+				category.list.splice(categoryIndex,1)
+			}
         }
 
 
@@ -57,8 +60,19 @@ const categorySlice = createSlice({
 // REDUCER
 export default categorySlice.reducer;
 
-const { requestSavingCategory,savingCategorySuccess, savingFailed, deleteCategorySuccess  } =
+const { requestSavingCategory,savingCategorySuccess,receiveCategoriesFailed, savingFailed, deleteCategorySuccess, requestCategories,receiveCategories  } =
 	categorySlice.actions;
+
+const getCategory =():AppThunk => async dispatch => {
+	try {
+		dispatch(requestCategories())
+		const { data: categoryResponse } = await categoryService.getCategories()
+		dispatch(receiveCategories(categoryResponse))
+	} catch (error) {
+		dispatch(receiveCategoriesFailed())
+	}
+} 
+
 
 const saveCategory =(
     categoryData: Partial<GetCategoryInterface>,
@@ -67,8 +81,8 @@ const saveCategory =(
 		let data = null
 		try {
 			dispatch(requestSavingCategory())
-			if (categoryData.id) {
-				data = await categoryService.updateCategory(categoryData.id, categoryData)
+			if (categoryData?._id) {
+				data = await categoryService.updateCategory(categoryData._id, categoryData)
 			} else {
 				data = await categoryService.createCategory(categoryData)
 			}
@@ -79,10 +93,14 @@ const saveCategory =(
 		}
 	}
 
-    const deleteCategory =(id:DeleteCategoryInterface):AppThunk => async dispatch => {
+    const deleteCategory =(id:DeleteCategoryInterface | string ):AppThunk => async dispatch => {
         try {
-            const response = categoryService.deleteCategory(id)
-            dispatch(deleteCategorySuccess(id))
+            const response = await categoryService.deleteCategory(id)
+			const {data} = response
+            dispatch(deleteCategorySuccess(data))
+			data.deletedCarsIds.forEach((id: string) => {
+				dispatch(deleteCarSuccess(id))
+			})
         } catch (error) {
             console.log("failed delete")
         }
@@ -95,6 +113,7 @@ const selectCategoryList = () => (state: RootState) => selectCategoryState(state
 
 export {
 	saveCategory,
+	getCategory,
     deleteCategory,
 	selectCategoryList
 };

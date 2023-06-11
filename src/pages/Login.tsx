@@ -1,11 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, FormInput } from "../components"
-import { Link, Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import * as Yup from "yup";
 import useAppDispatch from "../hooks/useAppDispatch";
 import { LoginInterface } from "../types/auth.types";
 import { login } from "../store/auth.slice";
 import { FormProvider, useForm } from "react-hook-form";
+import { getSignupPageRoute } from "../config/routes";
 
 
 
@@ -21,7 +22,7 @@ const Login = () => {
   const methods = useForm<LoginInterface>({ resolver: yupResolver(loginValidationSchema) });
 
   const onSubmit = (data: LoginInterface) => {
-    dispatch(login(data, () => navigate("./dashboard") ) );
+    dispatch(login(data));
   };
 
 
@@ -44,12 +45,12 @@ const Login = () => {
 
             <p className="text-center text-sm text-gray-500">
               No account?
-              <Link to="/signup" className="underline cursor-pointer " >Sign up</Link>
+              <div className="underline cursor-pointer" onClick={() => navigate(getSignupPageRoute())}>Sign up</div>
             </p>
           </form>
         </div>
       </div>
-   </FormProvider>
+    </FormProvider>
   )
 }
 

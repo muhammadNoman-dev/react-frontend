@@ -2,14 +2,16 @@
 import axios from "axios"
 import { CreateCategoryInterface, DeleteCategoryInterface, GetCategoryInterface } from "../types/category.types"
 
-const ROOT_PATH = "localhost:8081/api"
+const ROOTPATH= "categories"
 
 
 export default class CategoryService {
-	static createCategory = (category: Partial<GetCategoryInterface>) => axios.post<Partial<GetCategoryInterface>>(ROOT_PATH, category)
+	static createCategory = (category: Partial<GetCategoryInterface>) => axios.post<Partial<GetCategoryInterface>>(`${ROOTPATH}`, category)
 
     static updateCategory = (id: string, category: Partial<CreateCategoryInterface>) =>
-    axios.put<GetCategoryInterface>(`${ROOT_PATH}/${id}`, category)
+    axios.put<GetCategoryInterface>(`categories/${id}`, category)
 
-    static deleteCategory = (categotyId: DeleteCategoryInterface ) => axios.delete(`${ROOT_PATH}/${categotyId}` )
+    static getCategories = () => axios.get(`${ROOTPATH}`)
+
+    static deleteCategory = (categotyId: DeleteCategoryInterface | string ) => axios.delete(`${ROOTPATH}/${categotyId}` )
 }
