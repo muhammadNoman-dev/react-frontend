@@ -67,7 +67,7 @@ const Category = () => {
     return (
         <div className='p-6' >
             <FormProvider {...methods}>
-                <div>Category</div>
+                <div className='font-bold text-lg' >Category</div>
                 <form
                     onSubmit={methods.handleSubmit(onSubmit)}
                     className="flex flex-col items-center mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"

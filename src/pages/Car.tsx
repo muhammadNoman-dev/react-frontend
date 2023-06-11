@@ -97,7 +97,7 @@ const Car = () => {
     return (
         <div className='p-6'>
             <FormProvider {...methods}>
-                <div>Car</div>
+                <div className='font-bold text-lg ' >Car</div>
                 <form
                     onSubmit={methods.handleSubmit(onSubmit)}
                     className="flex flex-col items-center mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
@@ -122,7 +122,6 @@ const Car = () => {
                         <Button className="bg-blue-400" type="submit">Update</Button>
                         <Button className="bg-blue-400" type="reset" onClick={() => setUpdateData(null)}>New</Button>
                     </div> : <Button className="bg-blue-400" type="submit" >Create</Button>}
-                    {/* <Button className="bg-blue-400" type="submit" >Submit</Button> */}
                 </form>
             </FormProvider>
 

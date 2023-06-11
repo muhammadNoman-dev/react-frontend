@@ -14,15 +14,15 @@ const Dashboard = () => {
   useEffect(() => {
     dispatch(getCategory())
     dispatch(getCar())
-  
+
   }, [])
 
-    return (
-        <div>
-          <Category/>
-          <Car/>
-        </div>
-    )
+  return (
+    <div className='p-12' >
+      <Category />
+      <Car />
+    </div>
+  )
 }
 
 export default Dashboard
